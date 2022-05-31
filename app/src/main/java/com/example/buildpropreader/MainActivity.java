@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         TextView propText = findViewById(R.id.prop_text);
-//        TextView lineText = findViewById(R.id.text_line);
 
         if (propText != null) {
             propText.setText(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ? Html.fromHtml(propReader(), Html.FROM_HTML_MODE_COMPACT) : Html.fromHtml(propReader()));
@@ -32,16 +31,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String propReader() {
-        Process process = null;
+        Process process;
         try {
             process = new ProcessBuilder().command("/system/bin/getprop")
                     .redirectErrorStream(true).start();
         } catch (IOException e) {
-            Toast.makeText(this, "not found /system/bin/getprop", Toast.LENGTH_LONG).show();
             e.printStackTrace();
+            return "<center><b>Cannot found file /system/bin/getprop - failed</b></center>";
         }
 
-
+        if(process == null) {
+            return "<center><b>Cannot found file /system/bin/getprop</b></center>";
+        }
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
         StringBuilder log = new StringBuilder();
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 String newLine = line.replace("[", "").replace("]", "");
                 String[] htmlLine = newLine.split(":");
 
-                log.append("<b>" + htmlLine[0] + "</b> <br>"+htmlLine[1] + "<br><br>");
+                log.append("<b>").append(htmlLine[0]).append("</b> <br>").append(htmlLine[1]).append("<br><br>");
             }
         } catch (IOException e) {
             e.printStackTrace();
